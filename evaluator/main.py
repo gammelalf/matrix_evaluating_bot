@@ -13,22 +13,12 @@ logger = logging.getLogger(__name__)
 async def main():
     config = JsonConfig("config.json")
 
-    # Configuration options for the AsyncClient
-    client_config = AsyncClientConfig(
+    client = config.new_async_client(AsyncClientConfig(
         max_limit_exceeded=0,
         max_timeouts=0,
         store_sync_tokens=True,
         encryption_enabled=True,
-    )
-
-    # Initialize the matrix client
-    client = AsyncClient(
-        config.homeserver,
-        config.user_id,
-        device_id=config.device_id,
-        store_path=config.store_path,
-        config=client_config,
-    )
+    ))
 
     async def join(room, event):
         logger.debug(f"Got invite to {room.room_id} from {event.sender}.")
