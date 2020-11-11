@@ -1,0 +1,13 @@
+[Unit]
+Description=Evaluator Bot
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStart=/home/evaluator/venv/bin/python evaluator.py
+User=evaluator
+WorkingDirectory=/home/evaluator
+Restart=always
+KillSignal=SIGKILL
+StandardError=syslog
