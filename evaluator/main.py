@@ -28,7 +28,11 @@ async def main():
         msg = event.body
         if msg.startswith("!eval"):
             expr = msg[len("!eval"):].strip()
-            await send_text_to_room(client, room.room_id, str(evaluate(expr)), markdown_convert=False)
+            try:
+                value = evaluate(expr)
+            except:
+                return
+            await send_text_to_room(client, room.room_id, str(value), markdown_convert=False)
 
     client.add_event_callback(debug(), Event)
     client.add_event_callback(auto_join(client), InviteMemberEvent)
