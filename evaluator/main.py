@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
 import logging
 import asyncio
-import sys
 
 from nio import AsyncClientConfig, AsyncClient, InviteMemberEvent, JoinError
 
 from hopfenmatrix.run import run
-from evaluator.config import Config
+from hopfenmatrix.config import JsonConfig
 
 logger = logging.getLogger(__name__)
 
 
 async def main():
-    # Read config file
-    if len(sys.argv) > 1:
-        config_path = sys.argv[1]
-    else:
-        config_path = "config.yaml"
-    config = Config(config_path)
+    config = JsonConfig("config.json")
 
     # Configuration options for the AsyncClient
     client_config = AsyncClientConfig(
@@ -29,7 +23,7 @@ async def main():
 
     # Initialize the matrix client
     client = AsyncClient(
-        config.homeserver_url,
+        config.homeserver,
         config.user_id,
         device_id=config.device_id,
         store_path=config.store_path,
@@ -58,7 +52,7 @@ async def main():
 
     client.add_event_callback(join, InviteMemberEvent)
 
-    await run(client, config.user_id, config.user_password, config.device_name)
+    await run(client, config)
 
 
 asyncio.get_event_loop().run_until_complete(main())
