@@ -2,10 +2,11 @@
 import logging
 import asyncio
 
-from nio import AsyncClientConfig, AsyncClient, InviteMemberEvent, JoinError
+from nio import AsyncClientConfig, InviteMemberEvent, Event
 
 from hopfenmatrix.run import run
 from hopfenmatrix.config import JsonConfig
+from hopfenmatrix.callbacks import auto_join, debug
 
 logger = logging.getLogger(__name__)
 
@@ -20,27 +21,8 @@ async def main():
         encryption_enabled=True,
     ))
 
-    async def join(room, event):
-        logger.debug(f"Got invite to {room.room_id} from {event.sender}.")
-
-        # Attempt to join 3 times before giving up
-        for attempt in range(3):
-            result = await client.join(room.room_id)
-            if type(result) == JoinError:
-                logger.error(
-                    f"Error joining room {room.room_id} (attempt %d): %s",
-                    attempt,
-                    result.message,
-                )
-            else:
-                break
-        else:
-            logger.error("Unable to join room: %s", room.room_id)
-
-        # Successfully joined room
-        logger.info(f"Joined {room.room_id}")
-
-    client.add_event_callback(join, InviteMemberEvent)
+    client.add_event_callback(debug(), Event)
+    client.add_event_callback(auto_join(client), InviteMemberEvent)
 
     await run(client, config)
 
