@@ -4,6 +4,8 @@ import asyncio
 
 from nio import AsyncClientConfig, InviteMemberEvent, Event, MatrixRoom, RoomMessage
 
+from expr_parser import evaluate
+
 from hopfenmatrix.run import run
 from hopfenmatrix.config import JsonConfig
 from hopfenmatrix.callbacks import auto_join, debug
@@ -26,7 +28,7 @@ async def main():
         msg = event.body
         if msg.startswith("!eval"):
             expr = msg[len("!eval"):].strip()
-            send_text_to_room(client, room.room_id, eval(expr))
+            await send_text_to_room(client, room.room_id, str(evaluate(expr)), markdown_convert=False)
 
     client.add_event_callback(debug(), Event)
     client.add_event_callback(auto_join(client), InviteMemberEvent)
