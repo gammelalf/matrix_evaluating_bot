@@ -9,7 +9,7 @@ from expr_parser import evaluate
 from hopfenmatrix.run import run
 from hopfenmatrix.config import JsonConfig
 from hopfenmatrix.callbacks import auto_join, debug
-from hopfenmatrix.chat_functions import send_text_to_room
+from hopfenmatrix.chat_functions import reply_to
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ async def main():
                 value = evaluate(expr)
             except:
                 return
-            await send_text_to_room(client, room.room_id, str(value), markdown_convert=False)
+            await reply_to(client, event, str(value))
 
     client.add_event_callback(debug(), Event)
     client.add_event_callback(auto_join(client), InviteMemberEvent)
