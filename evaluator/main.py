@@ -7,7 +7,7 @@ from nio import AsyncClientConfig, InviteMemberEvent, Event, MatrixRoom, RoomMes
 from expr_parser import evaluate
 
 from hopfenmatrix.run import run
-from hopfenmatrix.config import JsonConfig
+from hopfenmatrix.config import Config
 from hopfenmatrix.callbacks import auto_join, debug
 from hopfenmatrix.chat_functions import reply_to
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 async def main():
-    config = JsonConfig("config.json")
+    config = Config.from_json("config.json")
 
     client = config.new_async_client(AsyncClientConfig(
         max_limit_exceeded=0,
