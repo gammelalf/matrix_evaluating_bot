@@ -9,7 +9,6 @@ from expr_parser import evaluate
 from hopfenmatrix.run import run
 from hopfenmatrix.config import Config
 from hopfenmatrix.callbacks import auto_join, debug
-from hopfenmatrix.chat_functions import reply_to
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +31,15 @@ async def main():
                 value = evaluate(expr)
             except:
                 return
-            await reply_to(client, event, str(value))
+            await client.room_send(
+                room.room_id,
+                "m.room.message",
+                {
+                    "msgtype": "m.notice",
+                    "body": str(value)
+                },
+                ignore_unverified_devices=True
+            )
 
     client.add_event_callback(debug(), Event)
     client.add_event_callback(auto_join(client), InviteMemberEvent)
