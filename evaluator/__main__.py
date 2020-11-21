@@ -26,9 +26,10 @@ async def main():
     api = ApiWrapper(display_name="Evaluator Bot")
 
     api.set_auto_join()
-    api.register_command(command, ["eval"], make_default=True)
+    api.register_command(command, [], make_default=True)
 
-    await run(client, config)
+    await api.start_bot()
 
 
-asyncio.get_event_loop().run_until_complete(main())
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(main())
