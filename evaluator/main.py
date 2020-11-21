@@ -6,44 +6,27 @@ from nio import AsyncClientConfig, InviteMemberEvent, Event, MatrixRoom, RoomMes
 
 from expr_parser import evaluate
 
-from hopfenmatrix.run import run
-from hopfenmatrix.config import Config
-from hopfenmatrix.callbacks import auto_join, debug
+from hopfenmatrix.api_wrapper import ApiWrapper
 
 logger = logging.getLogger(__name__)
 
 
+async def command(api: ApiWrapper, room: MatrixRoom, event: RoomMessage):
+    try:
+        value = evaluate(event.stripped_body)
+    except Exception as err:
+        logger.exception("Encountered error while evaluating:", exc_info=err)
+        return
+    await api.send_reply(str(value), room, event, send_as_notice=True)
+
+
+
+
 async def main():
-    config = Config.from_json("config.json")
+    api = ApiWrapper(display_name="Evaluator Bot")
 
-    client = config.new_async_client(AsyncClientConfig(
-        max_limit_exceeded=0,
-        max_timeouts=0,
-        store_sync_tokens=True,
-        encryption_enabled=True,
-    ))
-
-    async def command(room, event):
-        msg = event.body
-        if msg.startswith("!eval"):
-            expr = msg[len("!eval"):].strip()
-            try:
-                value = evaluate(expr)
-            except:
-                return
-            await client.room_send(
-                room.room_id,
-                "m.room.message",
-                {
-                    "msgtype": "m.notice",
-                    "body": str(value)
-                },
-                ignore_unverified_devices=True
-            )
-
-    client.add_event_callback(debug(), Event)
-    client.add_event_callback(auto_join(client), InviteMemberEvent)
-    client.add_event_callback(command, RoomMessage)
+    api.set_auto_join()
+    api.register_command(command, ["eval"], make_default=True)
 
     await run(client, config)
 
