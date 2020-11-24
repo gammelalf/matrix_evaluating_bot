@@ -5,7 +5,6 @@ import asyncio
 from nio import AsyncClientConfig, InviteMemberEvent, Event, MatrixRoom, RoomMessage
 
 from expr_parser import evaluate
-
 from hopfenmatrix.api_wrapper import ApiWrapper
 
 logger = logging.getLogger(__name__)
@@ -18,8 +17,6 @@ async def command(api: ApiWrapper, room: MatrixRoom, event: RoomMessage):
         logger.exception("Encountered error while evaluating:", exc_info=err)
         return
     await api.send_reply(str(value), room, event, send_as_notice=True)
-
-
 
 
 async def main():
